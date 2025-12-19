@@ -174,4 +174,4 @@ try:
 
 # ปิดบล็อก try ด้วย except เพื่อแก้ Syntax Error
 except Exception as e:
-    st.error(f"❌ เกิดข้อผิดพลาด: {e}")
+    st.error(f"❌ เกิดข้อผิดพลาด: {e}") Syntax Error
