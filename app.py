@@ -106,36 +106,45 @@ try:
         st.dataframe(filtered_df.sort_values(by='date', ascending=False), use_container_width=True)
         csv_data = filtered_df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 ดาวน์โหลดข้อมูลในตารางเป็น CSV", data=csv_data, file_name='eco_waste_report.csv', mime='text/csv')
-
-    # --- ส่วนที่ 4: Machine Learning ---
+# --- ส่วนที่ 4: Machine Learning ---
     st.divider()
     st.write("### 🤖 ระบบพยากรณ์ปริมาณขยะ (AI Prediction)")
     
-    # เตรียมข้อมูล ML (ใช้ข้อมูลทั้งหมด)
+    # 1. เตรียมข้อมูล ML
     ml_df = st.session_state.main_df.dropna().copy()
     ml_df['date_ordinal'] = ml_df['date'].apply(lambda x: x.toordinal())
-    X = ml_df[['date_ordinal', 'population']]
+    
+    # ใช้ Feature: วันที่, ประชากร, และ อุณหภูมิ
+    X = ml_df[['date_ordinal', 'population', 'temp_c']]
     y = ml_df['waste_kg']
     
-    model = LinearRegression().fit(X, y)
+    # 2. แบ่งข้อมูล Train/Test เพื่อสร้างตัวแปร X_test, y_test สำหรับวาดกราฟ
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    model = LinearRegression().fit(X_train, y_train)
+    y_pred = model.predict(X_test)
 
     ml_col1, ml_col2 = st.columns([1, 2])
+    
     with ml_col1:
-        st.write("กรอกจำนวนประชากรเพื่อพยากรณ์ขยะวันนี้:")
-        pop_input = st.number_input("จำนวนประชากร:", value=int(ml_df['population'].mean()), key='ml_pop')
-        if st.button("ทำนายผล"):
+        st.write("**ทำนายผลขยะรายวัน**")
+        pop_input = st.number_input("ระบุจำนวนประชากร:", value=int(ml_df['population'].mean()))
+        temp_input = st.slider("ระบุอุณหภูมิที่คาดการณ์ (°C):", 10.0, 45.0, 30.0)
+        
+        if st.button("คำนวณโดย AI"):
             current_date_ord = pd.Timestamp.now().toordinal()
-            pred = model.predict([[current_date_ord, pop_input]])
+            # ต้องส่งค่าให้ครบตาม Feature ที่เทรน (date, pop, temp)
+            pred = model.predict([[current_date_ord, pop_input, temp_input]])
             st.success(f"ปริมาณขยะที่คาดการณ์: {pred[0]:,.2f} kg")
+            st.info(f"R² Score (ความแม่นยำ): {r2_score(y_test, y_pred):.4f}")
     
     with ml_col2:
-        fig, ax = plt.subplots()
-        ax.scatter(X_test, y_test, color='skyblue', label='Actual Data', alpha=0.6)
-        ax.plot(X_test, y_pred, color='orange', label='Regression Line', linewidth=2)
-        ax.set_xlabel("Date (Ordinal)")
-        ax.set_ylabel("Waste (Tons)")
+        # กราฟเปรียบเทียบค่าจริง vs ค่าพยากรณ์
+        fig, ax = plt.subplots(figsize=(8, 5))
+        ax.scatter(y_test, y_pred, color='skyblue', alpha=0.6, label='Predicted vs Actual')
+        # เส้น 45 องศา (ถ้าจุดอยู่บนเส้นนี้คือแม่นยำมาก)
+        ax.plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2, label='Perfect Prediction')
+        ax.set_xlabel("Actual Waste (kg)")
+        ax.set_ylabel("Predicted Waste (kg)")
         ax.legend()
         st.pyplot(fig)
-
-except Exception as e:
-    st.error(f"❌ เกิดข้อผิดพลาด: {e}")
