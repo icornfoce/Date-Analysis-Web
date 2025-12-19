@@ -62,11 +62,13 @@ try:
 
     # --- Sidebar Filters ---
     st.sidebar.header("🔍 ตัวกรองแดชบอร์ด")
+    
     all_areas = df_display['area'].unique()
-
+    
     # สร้างปุ่ม "เลือกทั้งหมด" หรือ "ล้างทั้งหมด" เพื่อความสะดวก
     container = st.sidebar.container()
     all_selected = st.sidebar.checkbox("เลือกทุกพื้นที่", value=True)
+    
     if all_selected:
         selected_areas = all_areas
     else:
@@ -76,6 +78,8 @@ try:
         for area in all_areas:
             if st.sidebar.checkbox(area, value=False):
                 selected_areas.append(area)
+    
+    filtered_df = df_display[df_display['area'].isin(selected_areas)]
 
     # --- ส่วนที่ 2: Key Metrics ---
     col1, col2, col3, col4 = st.columns(4)
@@ -161,5 +165,3 @@ try:
 # ปิดบล็อก try ด้วย except เพื่อแก้ Syntax Error
 except Exception as e:
     st.error(f"❌ เกิดข้อผิดพลาด: {e}")
-
-
