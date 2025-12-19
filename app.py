@@ -129,7 +129,14 @@ try:
             st.success(f"ปริมาณขยะที่คาดการณ์: {pred[0]:,.2f} kg")
     
     with ml_col2:
-        st.info("โมเดลเรียนรู้จากสถิติประชากรและช่วงเวลา เพื่อช่วยวางแผนรถเก็บขยะให้เพียงพอต่อความต้องการ")
+        fig, ax = plt.subplots()
+        ax.scatter(X_test, y_test, color='skyblue', label='Actual Data', alpha=0.6)
+        ax.plot(X_test, y_pred, color='orange', label='Regression Line', linewidth=2)
+        ax.set_xlabel("Date (Ordinal)")
+        ax.set_ylabel("Waste (Tons)")
+        ax.legend()
+        st.pyplot(fig)
 
 except Exception as e:
     st.error(f"❌ เกิดข้อผิดพลาด: {e}")
+
