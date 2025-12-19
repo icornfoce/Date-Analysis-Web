@@ -63,8 +63,19 @@ try:
     # --- Sidebar Filters ---
     st.sidebar.header("🔍 ตัวกรองแดชบอร์ด")
     all_areas = df_display['area'].unique()
-    selected_areas = st.sidebar.multiselect("เลือกพื้นที่:", options=all_areas, default=all_areas)
-    filtered_df = df_display[df_display['area'].isin(selected_areas)]
+
+    # สร้างปุ่ม "เลือกทั้งหมด" หรือ "ล้างทั้งหมด" เพื่อความสะดวก
+    container = st.sidebar.container()
+    all_selected = st.sidebar.checkbox("เลือกทุกพื้นที่", value=True)
+    if all_selected:
+        selected_areas = all_areas
+    else:
+        # แสดงรายการให้เลือกทีละอันแบบ Checkbox จะทำให้ Sidebar ดูสูงขึ้นและใช้งานง่าย
+        selected_areas = []
+        st.sidebar.write("เลือกเฉพาะบางพื้นที่:")
+        for area in all_areas:
+            if st.sidebar.checkbox(area, value=False):
+                selected_areas.append(area)
 
     # --- ส่วนที่ 2: Key Metrics ---
     col1, col2, col3, col4 = st.columns(4)
@@ -150,4 +161,5 @@ try:
 # ปิดบล็อก try ด้วย except เพื่อแก้ Syntax Error
 except Exception as e:
     st.error(f"❌ เกิดข้อผิดพลาด: {e}")
+
 
