@@ -97,10 +97,20 @@ try:
         st.pyplot(fig)
 
     with tab3:
-        st.write("**ตารางข้อมูลทั้งหมด**")
-        st.dataframe(filtered_df.sort_values(by='date', ascending=False), use_container_width=True)
+        st.write("**ตารางข้อมูลทั้งหมด (ซ่อนลำดับแถว)**")
+        # เพิ่ม hide_index=True เพื่อไม่ให้เห็นว่าหน้าแถวเป็นช่องที่เท่าไร
+        st.dataframe(
+            filtered_df.sort_values(by='date', ascending=False), 
+            use_container_width=True,
+            hide_index=True  # <--- เพิ่มบรรทัดนี้ครับ
+        )
         csv_data = filtered_df.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Download CSV", data=csv_data, file_name='waste_report.csv', mime='text/csv')
+        st.download_button(
+            "📥 Download CSV", 
+            data=csv_data, 
+            file_name='waste_report.csv', 
+            mime='text/csv'
+        )
 
     # --- ส่วนที่ 4: Machine Learning ---
     st.divider()
@@ -140,3 +150,4 @@ try:
 # ปิดบล็อก try ด้วย except เพื่อแก้ Syntax Error
 except Exception as e:
     st.error(f"❌ เกิดข้อผิดพลาด: {e}")
+
