@@ -45,10 +45,9 @@ try:
         with f_col3:
             in_pop = st.number_input("จำนวนประชากร", value=int(df_display['population'].mean()))
             t_col1, t_col2 = st.columns(2)
-
+            
             with t_col1:
                 in_temp = st.number_input("อุณหภูมิ (°C)", value=25.0)
-                
             with t_col2:
                 in_rain = st.number_input("น้ำฝน (mm)", min_value=0.0, value=0.0) # เพิ่มช่องน้ำฝน
 
@@ -174,4 +173,4 @@ try:
 
 # ปิดบล็อก try ด้วย except เพื่อแก้ Syntax Error
 except Exception as e:
-    st.error(f"❌ เกิดข้อผิดพลาด: {e}") Syntax Error
+    st.error(f"❌ เกิดข้อผิดพลาด: {e}")
