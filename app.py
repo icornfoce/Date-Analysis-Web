@@ -112,7 +112,7 @@ try:
         st.pyplot(fig)
 
     with tab3:
-        st.write("**ตารางข้อมูลทั้งหมด (ซ่อนลำดับแถว)**")
+        st.write("**ตารางข้อมูลทั้งหมด**")
         # เพิ่ม hide_index=True เพื่อไม่ให้เห็นว่าหน้าแถวเป็นช่องที่เท่าไร
         st.dataframe(
             filtered_df.sort_values(by='date', ascending=False), 
@@ -165,3 +165,4 @@ try:
 # ปิดบล็อก try ด้วย except เพื่อแก้ Syntax Error
 except Exception as e:
     st.error(f"❌ เกิดข้อผิดพลาด: {e}")
+
