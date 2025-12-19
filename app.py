@@ -33,41 +33,32 @@ try:
     with st.expander("➕ บันทึกข้อมูลปริมาณขยะรายวันใหม่"):
         with st.form("waste_entry_form", clear_on_submit=True):
             f_col1, f_col2, f_col3 = st.columns(3)
+            with f_col1:
+                in_date = st.date_input("วันที่บันทึก")
+                in_area = st.selectbox("พื้นที่ (Area)", options=df_display['area'].unique())
+            with f_col2:
+                in_waste = st.number_input("ปริมาณขยะที่เก็บได้ (kg)", min_value=0.0)
+                in_recycle = st.number_input("รีไซเคิลได้ (kg)", min_value=0.0)
+            with f_col3:
+                in_pop = st.number_input("จำนวนประชากรในวันนั้น", value=int(df_display['population'].mean()))
+                in_temp = st.slider("อุณหภูมิ (°C)", 10.0, 45.0, 25.0)
 
-        with f_col1:
-            in_date = st.date_input("วันที่บันทึก")
-            in_area = st.selectbox("พื้นที่ (Area)", options=df_display['area'].unique())
-
-        with f_col2:
-            in_waste = st.number_input("ปริมาณขยะที่เก็บได้ (kg)", min_value=0.0)
-            in_recycle = st.number_input("รีไซเคิลได้ (kg)", min_value=0.0)
-
-        with f_col3:
-            in_pop = st.number_input("จำนวนประชากร", value=int(df_display['population'].mean()))
-            t_col1, t_col2 = st.columns(2)
+            submitted = st.form_submit_button("บันทึกข้อมูลลงตาราง")
             
-            with t_col1:
-                in_temp = st.number_input("อุณหภูมิ (°C)", value=25.0)
-            with t_col2:
-                in_rain = st.number_input("น้ำฝน (mm)", min_value=0.0, value=0.0) # เพิ่มช่องน้ำฝน
-
-        submitted = st.form_submit_button("บันทึกข้อมูลลงตาราง")
-        
-        if submitted:
-            new_row = pd.DataFrame([{
-                'date': pd.to_datetime(in_date),
-                'area': in_area,
-                'waste_kg': in_waste,
-                'recyclable_kg': in_recycle,
-                'population': in_pop,
-                'temp_c': in_temp,
-                'rain_mm': in_rain, # บันทึกค่าน้ำฝน
-                'collection_capacity_kg': df_display['collection_capacity_kg'].mean(),
-                'overflow': 1 if in_waste > df_display['collection_capacity_kg'].mean() else 0
-            }])
-            st.session_state.main_df = pd.concat([st.session_state.main_df, new_row], ignore_index=True)
-            st.success("✅ บันทึกข้อมูลพร้อมปริมาณน้ำฝนเรียบร้อย!")
-            st.rerun()
+            if submitted:
+                new_row = pd.DataFrame([{
+                    'date': pd.to_datetime(in_date),
+                    'area': in_area,
+                    'waste_kg': in_waste,
+                    'recyclable_kg': in_recycle,
+                    'population': in_pop,
+                    'temp_c': in_temp,
+                    'collection_capacity_kg': df_display['collection_capacity_kg'].mean(),
+                    'overflow': 1 if in_waste > df_display['collection_capacity_kg'].mean() else 0
+                }])
+                st.session_state.main_df = pd.concat([st.session_state.main_df, new_row], ignore_index=True)
+                st.success("✅ บันทึกข้อมูลเรียบร้อย!")
+                st.rerun()
 
     # --- Sidebar Filters ---
     st.sidebar.header("🔍 ตัวกรองแดชบอร์ด")
@@ -121,7 +112,7 @@ try:
         st.pyplot(fig)
 
     with tab3:
-        st.write("**ตารางข้อมูลทั้งหมด**")
+        st.write("**ตารางข้อมูลทั้งหมด (ซ่อนลำดับแถว)**")
         # เพิ่ม hide_index=True เพื่อไม่ให้เห็นว่าหน้าแถวเป็นช่องที่เท่าไร
         st.dataframe(
             filtered_df.sort_values(by='date', ascending=False), 
@@ -174,3 +165,6 @@ try:
 # ปิดบล็อก try ด้วย except เพื่อแก้ Syntax Error
 except Exception as e:
     st.error(f"❌ เกิดข้อผิดพลาด: {e}")
+
+    st.error(f"❌ เกิดข้อผิดพลาด: {e}")
+
